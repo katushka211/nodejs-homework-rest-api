@@ -7,11 +7,9 @@ const { validateBody } = require("../../middlewares");
 
 const { schemas } = require("../../models/contact");
 
-router
-  .route("/")
-  .get(ctrl.listContacts)
-  .post(validateBody(schemas.addSchema), ctrl.addContact);
-router.route("/:contactId").get(ctrl.getContactById);
+router.route("/").get(ctrl.listContacts);
+// .post(validateBody(schemas.addSchema), ctrl.addContact);
+// router.route("/:contactId").get(ctrl.getContactById);
 //   .delete(ctrl.removeContact)
 //   .put(validateBody(schemas.addSchema), ctrl.updateContact);
 
