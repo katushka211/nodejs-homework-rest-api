@@ -5,7 +5,7 @@ class HttpError extends Error {
     message = httpMessages[statusCode] || httpMessages.default
   ) {
     super(message);
-    this.statusCode = statusCode;
+    this.status = statusCode;
   }
 }
 
