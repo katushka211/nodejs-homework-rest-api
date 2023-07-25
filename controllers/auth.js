@@ -8,9 +8,9 @@ const { nanoid } = require("nanoid");
 
 const { User } = require("../models/user.js");
 
-const { HttpError, ctrlWrapper } = require("../helpers");
+const { HttpError, ctrlWrapper, sendEmail } = require("../helpers");
 
-const { SECRET_KEY } = process.env;
+const { SECRET_KEY, BASE_URL } = process.env;
 
 const avatarDir = path.join(__dirname, "../", "public", "avatars");
 
@@ -31,6 +31,15 @@ const register = ctrlWrapper(async (req, res) => {
     avatarURL,
     verificationCode,
   });
+
+  const verifyEmail = {
+    to: email,
+    subject: "Verify email",
+    html: `<a target="_blank" href="${BASE_URL}/api/auth/verify/${verificationCode}">Click verify email</a>`,
+  };
+
+  await sendEmail(verifyEmail);
+
   res
     .status(201)
     .json({ email: newUser.email, subscription: newUser.subscription });
@@ -41,6 +50,9 @@ const login = ctrlWrapper(async (req, res) => {
   const user = await User.findOne({ email });
   if (!user) {
     throw new HttpError(401, "Email or password is wrong");
+  }
+  if (!user.verify) {
+    throw new HttpError(401, "Email not verifiedngit");
   }
   const passwordCompare = await bcrypt.compare(password, user.password);
   if (!passwordCompare) {
