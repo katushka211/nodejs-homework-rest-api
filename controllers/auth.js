@@ -59,7 +59,7 @@ const verifyEmail = ctrlWrapper(async (req, res) => {
 });
 
 const resendVerifyEmail = ctrlWrapper(async (req, res) => {
-  const email = req.body;
+  const { email } = req.body;
   const user = User.findOne({ email });
   if (!user) {
     throw new HttpError(404, "User not found");
