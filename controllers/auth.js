@@ -45,6 +45,19 @@ const register = ctrlWrapper(async (req, res) => {
     .json({ email: newUser.email, subscription: newUser.subscription });
 });
 
+const verifyEmail = ctrlWrapper(async (req, res) => {
+  const { verificationCode } = req.params;
+  const user = await User.findOne({ verificationCode });
+  if (!user) {
+    throw new HttpError(404, "User not found");
+  }
+  await User.findByIdAndUpdate(user._id, {
+    verify: true,
+    verificationCode: "",
+  });
+  res.status(200).json({ message: "Verification successful" });
+});
+
 const login = ctrlWrapper(async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
@@ -102,4 +115,11 @@ const updateAvatar = ctrlWrapper(async (req, res) => {
   res.status(200).json({ avatarURL });
 });
 
-module.exports = { login, register, getCurrent, logout, updateAvatar };
+module.exports = {
+  login,
+  register,
+  verifyEmail,
+  getCurrent,
+  logout,
+  updateAvatar,
+};
