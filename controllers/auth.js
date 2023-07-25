@@ -4,6 +4,7 @@ const gravatar = require("gravatar");
 const path = require("path");
 const fs = require("fs/promises");
 const Jimp = require("jimp");
+const { nanoid } = require("nanoid");
 
 const { User } = require("../models/user.js");
 
@@ -22,11 +23,13 @@ const register = ctrlWrapper(async (req, res) => {
 
   const hashPassword = await bcrypt.hash(password, 10);
   const avatarURL = gravatar.url(email);
+  const verificationCode = nanoid();
 
   const newUser = await User.create({
     ...req.body,
     password: hashPassword,
     avatarURL,
+    verificationCode,
   });
   res
     .status(201)
