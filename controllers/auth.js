@@ -73,7 +73,7 @@ const resendVerifyEmail = ctrlWrapper(async (req, res) => {
     html: `<a target="_blank" href="${BASE_URL}/api/auth/verify/${user.verificationCode}">Click verify email</a>`,
   };
   await sendEmail(verifyEmail);
-  res.status(200).json({ message: "Verify email send success" });
+  res.status(200).json({ message: "Verification email sent" });
 });
 
 const login = ctrlWrapper(async (req, res) => {
