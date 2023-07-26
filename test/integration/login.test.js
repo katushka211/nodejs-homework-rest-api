@@ -15,22 +15,76 @@ describe("login", () => {
   afterAll(async () => {
     await mongoose.disconnect(DB_TEST_URI);
   });
-  test("should login user", async () => {
+
+  test("should return status code 200 on successful login", async () => {
+    const userEmail = "example@test.ua";
+    const userPassword = "123456789";
     await supertest(app).post("/api/auth/register").send({
-      email: "example@test.ua",
-      password: "123456789",
+      email: userEmail,
+      password: userPassword,
     });
     const response = await supertest(app).post("/api/auth/login").send({
-      email: "example@test.ua",
-      password: "123456789",
+      email: userEmail,
+      password: userPassword,
     });
     expect(response.statusCode).toBe(200);
+  });
+
+  test("should return a token on successful login", async () => {
+    const userEmail = "example@test.ua";
+    const userPassword = "123456789";
+    await supertest(app).post("/api/auth/register").send({
+      email: userEmail,
+      password: userPassword,
+    });
+    const response = await supertest(app).post("/api/auth/login").send({
+      email: userEmail,
+      password: userPassword,
+    });
     expect(response.body.token).toBeDefined();
+  });
+
+  test("should return an object with email and subscription fields of String type", async () => {
+    const userEmail = "example@test.ua";
+    const userPassword = "123456789";
+    await supertest(app).post("/api/auth/register").send({
+      email: userEmail,
+      password: userPassword,
+    });
+    const response = await supertest(app).post("/api/auth/login").send({
+      email: userEmail,
+      password: userPassword,
+    });
     expect(response.body.user).toEqual(
       expect.objectContaining({
         email: expect.any(String),
         subscription: expect.any(String),
       })
     );
+  });
+
+  test("should return an error for invalid user", async () => {
+    const response = await supertest(app).post("/api/auth/login").send({
+      email: "noname@test.ua",
+      password: "123456789",
+    });
+
+    expect(response.statusCode).toBe(401);
+  });
+
+  test("should return an error for invalid password", async () => {
+    const userEmail = "example@test.ua";
+    const userPassword = "123456789";
+    await supertest(app).post("/api/auth/register").send({
+      email: userEmail,
+      password: userPassword,
+    });
+
+    const response = await supertest(app).post("/api/auth/login").send({
+      email: userEmail,
+      password: "invalid",
+    });
+
+    expect(response.statusCode).toBe(401);
   });
 });
